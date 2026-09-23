@@ -9,10 +9,14 @@ import (
 	"github.com/gin-gonic/gin/binding"
 )
 
-type AuthController struct{}
+type AuthController struct{
+	service *service.AuthService
+}
 
-func NewAuthController() *AuthController {
-	return &AuthController{}
+func NewAuthController(service *service.AuthService) *AuthController {
+	return &AuthController{
+		service: service,
+	}
 }
 
 func (a *AuthController) Login(ctx *gin.Context) {
@@ -22,7 +26,7 @@ func (a *AuthController) Login(ctx *gin.Context) {
 		return
 	}
 
-	if res := service.NewAuthService().LoginService(payload); res != nil {
+	if res := a.service.LoginService(payload); res != nil {
 		ctx.JSON(404, gin.H{
 			"status": "failed",
 			"msg":    fmt.Sprintln("Login failed. Invalid username or password."),
@@ -41,7 +45,7 @@ func (a *AuthController) Register(ctx *gin.Context) {
 		return
 	}
 
-	if res := service.NewAuthService().RegisterService(payload); res != nil {
+	if res := a.service.RegisterService(payload); res != nil {
 		ctx.JSON(404, gin.H{
 			"status": "failed",
 			"msg":    res.Error(),
